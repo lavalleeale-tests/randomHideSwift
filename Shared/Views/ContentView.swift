@@ -7,15 +7,26 @@
 
 import SwiftUI
 
+
+
 struct ContentView: View {
+    let randomLong = Int.random(in: Int.min..<Int.max)
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        VStack {
+            Text("Random Hider")
+                .font(.title)
+                .padding()
+            findView(seed: String(randomLong))
+            hideView(seed: String(randomLong))
+        }
     }
 }
+
+
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         ContentView()
     }
 }
+
