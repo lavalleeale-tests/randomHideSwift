@@ -16,7 +16,6 @@ struct ContentView: View {
             Text("Random Hider")
                 .font(.title)
                 .padding()
-            findView(seed: String(randomLong))
             hideView(seed: String(randomLong))
         }
     }

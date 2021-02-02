@@ -3,8 +3,8 @@ import GameKit
 
 struct hideView: View {
     @State var seed: String
-    @State private var toHide: String  = "Text"
-    @State private var hiddenText: String = "Press Generate"
+    @State private var input: String  = "Text"
+    @State private var output: String = "Press Generate"
     var body: some View {
         
         VStack {
@@ -13,30 +13,34 @@ struct hideView: View {
                 TextField("", text: $seed)
             }.padding()
             HStack {
-                Text("To Hide:")
-                TextField("", text: $toHide)
+                Text("Input:")
+                TextField("", text: $input)
             }.padding()
             HStack {
-                Text("Hidden Text:")
-                Text(hiddenText)
-                    .lineLimit(hiddenText.count/60)
+                Text("Output:")
+                Text(output)
+                    .lineLimit(output.count/60)
                     .fixedSize(horizontal: false, vertical: true).onTapGesture {
                         NSPasteboard.general.declareTypes([.string], owner: nil)
-                        NSPasteboard.general.setString(hiddenText, forType: .string)
-                        //UIPasteboard.general.setData(hiddenText.data(using: .utf8)!, forPasteboardType: "")
+                        NSPasteboard.general.setString(output, forType: .string)
                     }
                     .onDrag {
-                        NSItemProvider(item: NSData(data: hiddenText.data(using: .utf8)!), typeIdentifier: kUTTypeUTF8PlainText as String)
+                        NSItemProvider(item: NSData(data: output.data(using: .utf8)!), typeIdentifier: kUTTypeUTF8PlainText as String)
                     }
             }.padding(EdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10))
             Button(action: {
-                hiddenText = generateText(toHide: toHide, seed: seed)
+                output = hideText(toHide: input, seed: seed)
             }) {
-                Text("Generate Text")
+                Text("Hide Text")
+            }
+            Button(action: {
+                output = findText(hiddenText: input, seed: seed)
+            }) {
+                Text("Find Text")
             }
         }.padding().frame(width: 800.0)
     }
-    func generateText(toHide: String, seed: String) -> String {
+    func hideText(toHide: String, seed: String) -> String {
         let rng = GKARC4RandomSource(seed: seed.data(using: .utf8)!)
         var _  = rng.dropValues(1024)
         let toHideChars = Array(toHide)
@@ -50,6 +54,22 @@ struct hideView: View {
         }
         hiddenArray[abs(rng.nextInt() % hiddenArray.count)] = "0"
         return String(hiddenArray)
+    }
+    func findText(hiddenText: String, seed: String) -> String {
+        let rng = GKARC4RandomSource(seed: seed.data(using: .utf8)!)
+        var _  = rng.dropValues(1024)
+        var cur:Character = "\n"
+        let hiddenChars = Array(hiddenText)
+        var outputChars: Array = Array<Character>()
+        while cur != "0" {
+            if cur == "\n" {
+                cur =  hiddenChars[abs(rng.nextInt() % hiddenChars.count)]
+                continue
+            }
+            outputChars.append(cur)
+            cur =  hiddenChars[abs(rng.nextInt() % hiddenChars.count)]
+        }
+        return String(outputChars)
     }
 }
 
